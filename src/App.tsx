@@ -12,7 +12,7 @@ type Product = {
   barcode?: string
   updatedAt: string
   createdAt: string
-  status: 'safe' | 'danger' | 'empty'
+  statuss: 'safe' | 'danger' | 'empty'
 }
 
 type Event = {
@@ -22,8 +22,8 @@ type Event = {
   metadata: any
 }
 
-const getColor = (status?: 'safe' | 'danger' | 'empty') => {
-  switch (status) {
+const getColor = (statuss?: 'safe' | 'danger' | 'empty') => {
+  switch (statuss) {
     case 'safe':
       return '#00b200'
     case 'danger':
@@ -35,23 +35,29 @@ const getColor = (status?: 'safe' | 'danger' | 'empty') => {
   }
 }
 
-const ProductCard = ({ value }: { value: Product }) => (
-  <div className="product-card" style={{ background: getColor(value.status) }}>
-    <div className="product-card-name">{value.name}</div>
-    <div className="product-card-desc">{value.description}</div>
-    <div className="product-card-stock">
-      Stock disponible: <b>{value.stock_available}</b>
-    </div>
-    <div className="product-card-date">
-      <div className="product-card-date">
-        Créé le {formatDate(value.createdAt)}
+const ProductCard = ({ value }: { value: Product }) => {
+  console.log(value)
+  return (
+    <div
+      className="product-card"
+      style={{ background: getColor(value.statuss) }}
+    >
+      <div className="product-card-name">{value.name}</div>
+      <div className="product-card-desc">{value.description}</div>
+      <div className="product-card-stock">
+        Stock disponible: <b>{value.stock_available}</b>
       </div>
       <div className="product-card-date">
-        Modifié le {formatDate(value.updatedAt)}
+        <div className="product-card-date">
+          Créé le {formatDate(value.createdAt)}
+        </div>
+        <div className="product-card-date">
+          Modifié le {formatDate(value.updatedAt)}
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const EventLine = ({ value }: { value: Event }) => (
   <div
@@ -147,15 +153,25 @@ const App = () => {
         <div className="page-container">
           {events.length > 0 && (
             <div className="event-container">
-              {events.map((event) => (
-                <EventLine key={event.id} value={event.attributes} />
-              ))}
+              {events.map((event) =>
+                event.attributes ? (
+                  <EventLine key={event.id} value={event.attributes} />
+                ) : (
+                  //@ts-expect-error
+                  <EventLine key={event.id} value={event} />
+                )
+              )}
             </div>
           )}
           <div className="card-container">
-            {values.map((value) => (
-              <ProductCard value={value.attributes} key={value.id} />
-            ))}
+            {values.map((value) =>
+              value.attributes ? (
+                <ProductCard value={value.attributes} key={value.id} />
+              ) : (
+                //@ts-expect-error
+                <ProductCard value={value} key={value.id} />
+              )
+            )}
           </div>
         </div>
       )}
